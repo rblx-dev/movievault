@@ -1,0 +1,35 @@
+import { MediaItem } from "@/lib/tmdb";
+import { MediaCard } from "./MediaCard";
+
+type MediaRowProps = {
+  id?: string;
+  title: string;
+  subtitle?: string;
+  items: MediaItem[];
+  mediaType?: "movie" | "tv";
+};
+
+export function MediaRow({ id, title, subtitle, items, mediaType }: MediaRowProps) {
+  const filtered = items.filter((item) => {
+    if (mediaType) return true;
+    return item.media_type === "movie" || item.media_type === "tv";
+  });
+
+  if (!filtered.length) return null;
+
+  return (
+    <section className="media-row" id={id}>
+      <div className="section-heading">
+        <h2>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+      </div>
+      <div className="media-rail" role="list">
+        {filtered.map((item, index) => (
+          <div key={`${item.media_type || mediaType}-${item.id}`} role="listitem">
+            <MediaCard item={item} mediaType={mediaType} priority={index < 4} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
