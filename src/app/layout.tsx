@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Figtree } from "next/font/google";
+import { Archivo_Black, Figtree, Permanent_Marker } from "next/font/google";
 import { Header } from "@/components/Header";
 import "./globals.css";
 
@@ -14,6 +14,12 @@ const body = Figtree({
   variable: "--font-body",
 });
 
+const mark = Permanent_Marker({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-mark",
+});
+
 export const metadata: Metadata = {
   title: {
     default: "MovieVault",
@@ -25,7 +31,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${display.variable} ${body.variable} ${mark.variable} h-full antialiased`}
+    >
       <body className="site-shell">
         <Header />
         <main className="site-main">{children}</main>
