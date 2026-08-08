@@ -416,8 +416,8 @@ img {
 
 .hero__video::after {
   bottom: 0;
-  height: 96px;
-  background: linear-gradient(0deg, rgba(8, 16, 28, 0.92), rgba(8, 16, 28, 0.25) 72%, transparent);
+  height: 140px;
+  background: linear-gradient(0deg, rgba(8, 16, 28, 0.97) 0%, rgba(8, 16, 28, 0.82) 45%, rgba(8, 16, 28, 0.45) 70%, transparent 100%);
 }
 
 .hero__veil {
