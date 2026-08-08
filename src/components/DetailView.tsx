@@ -1,7 +1,9 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CastStrip } from "@/components/CastStrip";
+import { Reveal } from "@/components/Reveal";
 import { TrailerPlayer } from "@/components/TrailerPlayer";
 import {
   backdropUrl,
@@ -40,13 +42,23 @@ export function DetailView({ details, type }: DetailViewProps) {
     <article className="detail">
       <div className="detail__hero">
         {backdrop && (
-          <Image src={backdrop} alt="" fill priority className="detail__backdrop" sizes="100vw" />
+          <Image
+            src={backdrop}
+            alt=""
+            fill
+            priority
+            className="detail__backdrop"
+            sizes="100vw"
+          />
         )}
         <div className="detail__veil" aria-hidden />
       </div>
 
-      <div className="detail__body">
-        <div className="detail__poster-wrap">
+      <Reveal className="detail__body" as="div">
+        <div
+          className="detail__poster-wrap rise-stagger"
+          style={{ "--stagger": "0" } as CSSProperties}
+        >
           {poster ? (
             <Image
               src={poster}
@@ -62,15 +74,30 @@ export function DetailView({ details, type }: DetailViewProps) {
         </div>
 
         <div className="detail__copy">
-          <p className="detail__eyebrow">
+          <p
+            className="detail__eyebrow rise-stagger"
+            style={{ "--stagger": "1" } as CSSProperties}
+          >
             <Link href="/">MovieVault</Link>
             <span aria-hidden> / </span>
             {type === "movie" ? "Film" : "Series"}
           </p>
-          <h1>{title}</h1>
-          {details.tagline && <p className="detail__tagline">{details.tagline}</p>}
+          <h1 className="rise-stagger" style={{ "--stagger": "2" } as CSSProperties}>
+            {title}
+          </h1>
+          {details.tagline && (
+            <p
+              className="detail__tagline rise-stagger"
+              style={{ "--stagger": "3" } as CSSProperties}
+            >
+              {details.tagline}
+            </p>
+          )}
 
-          <div className="detail__facts">
+          <div
+            className="detail__facts rise-stagger"
+            style={{ "--stagger": "4" } as CSSProperties}
+          >
             {year && <span>{year}</span>}
             {runtime && <span>{runtime}</span>}
             {details.vote_average > 0 && (
@@ -82,18 +109,30 @@ export function DetailView({ details, type }: DetailViewProps) {
           </div>
 
           {details.genres?.length > 0 && (
-            <ul className="detail__genres">
+            <ul
+              className="detail__genres rise-stagger"
+              style={{ "--stagger": "5" } as CSSProperties}
+            >
               {details.genres.map((genre) => (
                 <li key={genre.id}>{genre.name}</li>
               ))}
             </ul>
           )}
 
-          <p className="detail__overview">{details.overview || "No synopsis available."}</p>
+          <p
+            className="detail__overview rise-stagger"
+            style={{ "--stagger": "6" } as CSSProperties}
+          >
+            {details.overview || "No synopsis available."}
+          </p>
         </div>
-      </div>
+      </Reveal>
 
-      {trailer && <TrailerPlayer trailer={trailer} />}
+      {trailer && (
+        <Reveal as="div">
+          <TrailerPlayer trailer={trailer} />
+        </Reveal>
+      )}
       <CastStrip cast={cast} />
     </article>
   );

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -35,12 +36,28 @@ export function Hero({ featured }: HeroProps) {
       <div className="hero__grain" aria-hidden />
 
       <div className="hero__content">
-        <p className="hero__brand">MovieVault</p>
-        <h1 className="hero__headline">Your personal vault for films &amp; television.</h1>
-        <p className="hero__lede">
+        <p
+          className="hero__brand rise-stagger"
+          style={{ "--stagger": "0" } as CSSProperties}
+        >
+          MovieVault
+        </p>
+        <h1
+          className="hero__headline rise-stagger"
+          style={{ "--stagger": "1" } as CSSProperties}
+        >
+          Your personal vault for films &amp; television.
+        </h1>
+        <p
+          className="hero__lede rise-stagger"
+          style={{ "--stagger": "2" } as CSSProperties}
+        >
           Browse through trending titles, dig into casts, ratings, and view trailers.
         </p>
-        <div className="hero__actions">
+        <div
+          className="hero__actions rise-stagger"
+          style={{ "--stagger": "3" } as CSSProperties}
+        >
           <Link href={`/${type}/${featured.id}`} className="btn btn--primary">
             Open {title}
           </Link>
@@ -48,7 +65,10 @@ export function Hero({ featured }: HeroProps) {
             Search the vault
           </Link>
         </div>
-        <p className="hero__feature">
+        <p
+          className="hero__feature rise-stagger"
+          style={{ "--stagger": "4" } as CSSProperties}
+        >
           Featured · {type === "movie" ? "Film" : "Series"}
           {year ? ` · ${year}` : ""}
           {rating ? ` · ${rating}/10` : ""}

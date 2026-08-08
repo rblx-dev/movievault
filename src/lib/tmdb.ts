@@ -57,6 +57,28 @@ export type MediaDetails = MediaItem & {
   };
 };
 
+export type PersonCredit = MediaItem & {
+  character?: string;
+  media_type?: MediaType;
+};
+
+export type PersonDetails = {
+  id: number;
+  name: string;
+  biography: string;
+  birthday: string | null;
+  deathday: string | null;
+  place_of_birth: string | null;
+  known_for_department: string | null;
+  profile_path: string | null;
+  also_known_as: string[];
+  popularity?: number;
+  combined_credits?: {
+    cast: PersonCredit[];
+    crew: PersonCredit[];
+  };
+};
+
 type Paginated<T> = {
   page: number;
   results: T[];
@@ -176,6 +198,13 @@ export async function getMovieDetails(id: string | number) {
 export async function getTVDetails(id: string | number) {
   return tmdbFetch<MediaDetails>(`/tv/${id}`, {
     append_to_response: "credits,videos",
+    language: "en-US",
+  });
+}
+
+export async function getPersonDetails(id: string | number) {
+  return tmdbFetch<PersonDetails>(`/person/${id}`, {
+    append_to_response: "combined_credits",
     language: "en-US",
   });
 }

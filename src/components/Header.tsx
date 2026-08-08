@@ -21,9 +21,15 @@ export function Header() {
           <span className="brand-mark__v">V</span>
         </Link>
         <nav className="site-nav" aria-label="Primary">
-          <Link href="/#trending">Trending</Link>
-          <Link href="/#movies">Movies</Link>
-          <Link href="/#tv">TV</Link>
+          <Link href="/#trending" className="site-nav__link">
+            Trending
+          </Link>
+          <Link href="/#movies" className="site-nav__link">
+            Movies
+          </Link>
+          <Link href="/#tv" className="site-nav__link">
+            TV
+          </Link>
         </nav>
         <div className="site-header__search">
           <SearchForm compact />
