@@ -1,4 +1,7 @@
+"use client";
+
 import type { CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HeroVideo } from "@/components/HeroVideo";
@@ -19,9 +22,45 @@ export function Hero({ featured, trailerKey }: HeroProps) {
   const title = displayTitle(featured);
   const backdrop = backdropUrl(featured.backdrop_path || featured.poster_path, "original");
   const href = `/${type}/${featured.id}`;
+  const sectionRef = useRef<HTMLElement>(null);
+  const [started, setStarted] = useState(false);
+  const [textless, setTextless] = useState(false);
+  const [trailerMode, setTrailerMode] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const hero = sectionRef.current;
+      if (!hero) return;
+      setTrailerMode(started && window.scrollY <= hero.offsetHeight / 2);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [started]);
+
+  useEffect(() => {
+    const body = document.body;
+    body.classList.toggle("is-trailer", trailerMode);
+    return () => body.classList.remove("is-trailer");
+  }, [trailerMode]);
+
+  const playTrailer = () => {
+    setStarted(true);
+    setTextless(true);
+    setTrailerMode(true);
+    setSoundOn(true);
+  };
+
+  const sectionClass = [
+    "hero",
+    textless && "hero--textless",
+    trailerMode && "hero--clean",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <section className="hero">
+    <section ref={sectionRef} className={sectionClass}>
       {backdrop && (
         <Image
           src={backdrop}
@@ -32,7 +71,7 @@ export function Hero({ featured, trailerKey }: HeroProps) {
           sizes="100vw"
         />
       )}
-      {trailerKey && <HeroVideo videoKey={trailerKey} />}
+      {trailerKey && <HeroVideo videoKey={trailerKey} soundOn={soundOn} />}
       <div className="hero__veil" aria-hidden />
       <div className="hero__glow" aria-hidden />
       <div className="hero__grain" aria-hidden />
@@ -64,6 +103,11 @@ export function Hero({ featured, trailerKey }: HeroProps) {
           <Link href={href} className="btn btn--primary">
             Open {title}
           </Link>
+          {trailerKey && (
+            <button type="button" className="btn btn--ghost" onClick={playTrailer}>
+              Play trailer
+            </button>
+          )}
           <Link href="/search" className="btn btn--ghost">
             Search the vault
           </Link>
