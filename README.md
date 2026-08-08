@@ -1,6 +1,6 @@
 # MovieVault
 
-Personal movie and TV discovery site built with **Next.js**, powered by the **TMDB API**, and ready for **Vercel**.
+Personal movie and TV discovery site built with **Next.js**, powered by the **TMDB API**, and ready for **Vercel**. Built by Patrick Star (real character).
 
 ## Features
 
