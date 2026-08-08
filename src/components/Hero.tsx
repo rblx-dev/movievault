@@ -38,8 +38,7 @@ export function Hero({ featured }: HeroProps) {
         <p className="hero__brand">MovieVault</p>
         <h1 className="hero__headline">Your personal vault for films &amp; television.</h1>
         <p className="hero__lede">
-          Browse trending titles, dig into cast and ratings, and pull trailers — powered by TMDB
-          for {process.env.TMDB_ACCOUNT || "you"}.
+          Browse trending titles, dig into cast and ratings, and pull trailers.
         </p>
         <div className="hero__actions">
           <Link href={`/${type}/${featured.id}`} className="btn btn--primary">
