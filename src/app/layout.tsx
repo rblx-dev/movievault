@@ -36,14 +36,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${display.variable} ${body.variable} ${mark.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("mv-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}else if(window.matchMedia("(prefers-color-scheme: light)").matches){document.documentElement.setAttribute("data-theme","light");}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="site-shell">
         <Header />
         <main className="site-main">{children}</main>
         <footer className="site-footer">
           <div className="site-footer__inner">
-            <p>
-              MovieVault for{" "}
-              <strong>{process.env.TMDB_ACCOUNT || "patrickstarbutsmart"}</strong>
+            <p>©️MovieVault 2026</p>
+            <p className="site-footer__fun">
+              Curated with late-night popcorn and too many rewatches.
             </p>
             <p>
               Data from{" "}

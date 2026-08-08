@@ -13,7 +13,7 @@ export function TrailerPlayer({ trailer }: TrailerPlayerProps) {
       </div>
       <div className="trailer__frame">
         <iframe
-          src={`https://www.youtube.com/embed/${trailer.key}`}
+          src={`https://www.youtube.com/embed/${trailer.key}?vq=hd2160`}
           title={trailer.name}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { CastStrip } from "@/components/CastStrip";
 import { Reveal } from "@/components/Reveal";
 import { TrailerPlayer } from "@/components/TrailerPlayer";
+import { WatchProviders } from "@/components/WatchProviders";
 import {
   backdropUrl,
   displayTitle,
@@ -133,6 +134,7 @@ export function DetailView({ details, type }: DetailViewProps) {
           <TrailerPlayer trailer={trailer} />
         </Reveal>
       )}
+      <WatchProviders id={details.id} type={type} />
       <CastStrip cast={cast} />
     </article>
   );

@@ -1,10 +1,15 @@
+import Link from "next/link";
 import { Hero } from "@/components/Hero";
 import { MediaRow } from "@/components/MediaRow";
 import {
+  displayTitle,
+  getMovieDetails,
   getPopularMovies,
   getPopularTV,
   getTopRatedMovies,
+  getTrailer,
   getTrending,
+  getTVDetails,
   resolveMediaType,
 } from "@/lib/tmdb";
 
@@ -20,9 +25,39 @@ export default async function HomePage() {
     trending.results.find((item) => resolveMediaType(item) && item.backdrop_path) ||
     trending.results[0];
 
+  let trailerKey: string | null = null;
+  if (featured) {
+    const type = resolveMediaType(featured) || "movie";
+    try {
+      const details =
+        type === "movie"
+          ? await getMovieDetails(featured.id)
+          : await getTVDetails(featured.id);
+      trailerKey = getTrailer(details.videos?.results)?.key ?? null;
+    } catch {
+      trailerKey = null;
+    }
+  }
+
   return (
     <>
-      {featured && <Hero featured={featured} />}
+      {featured && <Hero featured={featured} trailerKey={trailerKey} />}
+      <div className="marquee">
+        <div className="marquee__track">
+          {[...trending.results, ...trending.results].map((item, i) => (
+            <Link
+              key={`${item.id}-${i}`}
+              href={`/${resolveMediaType(item) || "movie"}/${item.id}`}
+              className="marquee__item"
+            >
+              <span className="marquee__pop" aria-hidden>
+                ✦
+              </span>
+              {displayTitle(item)}
+            </Link>
+          ))}
+        </div>
+      </div>
       <div className="page-wrap">
         <MediaRow
           id="trending"

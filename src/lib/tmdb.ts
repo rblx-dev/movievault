@@ -62,6 +62,27 @@ export type PersonCredit = MediaItem & {
   media_type?: MediaType;
 };
 
+export type WatchProvider = {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string | null;
+  display_priority: number;
+};
+
+export type WatchProviders = {
+  link?: string;
+  flatrate?: WatchProvider[];
+  rent?: WatchProvider[];
+  buy?: WatchProvider[];
+  free?: WatchProvider[];
+  ads?: WatchProvider[];
+};
+
+type WatchProvidersResponse = {
+  id: number;
+  results: Record<string, WatchProviders>;
+};
+
 export type PersonDetails = {
   id: number;
   name: string;
@@ -135,6 +156,14 @@ export function profileUrl(path: string | null | undefined, size: "w185" | "h632
   return `${IMAGE_BASE}/${size}${path}`;
 }
 
+export function providerLogoUrl(
+  path: string | null | undefined,
+  size: "w45" | "w92" | "w154" | "w185" = "w92",
+) {
+  if (!path) return null;
+  return `${IMAGE_BASE}/${size}${path}`;
+}
+
 export function displayTitle(item: Pick<MediaItem, "title" | "name">) {
   return item.title || item.name || "Untitled";
 }
@@ -154,9 +183,11 @@ export function resolveMediaType(item: MediaItem): MediaType | null {
 export function getTrailer(videos?: Video[]) {
   if (!videos?.length) return null;
   const youtube = videos.filter((v) => v.site === "YouTube");
+  const trailers = youtube.filter((v) => v.type === "Trailer");
   return (
-    youtube.find((v) => v.type === "Trailer" && v.official) ||
-    youtube.find((v) => v.type === "Trailer") ||
+    trailers.find((v) => v.official && /official/i.test(v.name)) ||
+    trailers.find((v) => v.official) ||
+    trailers.find((v) => !v.official) ||
     youtube.find((v) => v.type === "Teaser") ||
     youtube[0] ||
     null
@@ -207,6 +238,12 @@ export async function getPersonDetails(id: string | number) {
     append_to_response: "combined_credits",
     language: "en-US",
   });
+}
+
+export async function getWatchProviders(id: string | number, type: MediaType) {
+  const data = await tmdbFetch<WatchProvidersResponse>(`/${type}/${id}/watch/providers`);
+  const region = data.results?.["US"] ?? Object.values(data.results ?? {})[0];
+  return region ?? null;
 }
 
 export async function getAccount() {

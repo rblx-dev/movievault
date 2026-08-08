@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SearchForm } from "./SearchForm";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   return (
@@ -25,14 +26,17 @@ export function Header() {
             Trending
           </Link>
           <Link href="/#movies" className="site-nav__link">
-            Movies
+            Films
           </Link>
           <Link href="/#tv" className="site-nav__link">
             TV
           </Link>
         </nav>
-        <div className="site-header__search">
-          <SearchForm compact />
+        <div className="site-header__actions">
+          <div className="site-header__search">
+            <SearchForm compact />
+          </div>
+          <ThemeToggle />
         </div>
       </div>
     </header>
