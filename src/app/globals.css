@@ -398,6 +398,28 @@ img {
   border: 0;
 }
 
+.hero__video::before,
+.hero__video::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero__video::before {
+  top: 0;
+  height: 72px;
+  background: linear-gradient(180deg, rgba(8, 16, 28, 0.88), rgba(8, 16, 28, 0.18) 75%, transparent);
+}
+
+.hero__video::after {
+  bottom: 0;
+  height: 96px;
+  background: linear-gradient(0deg, rgba(8, 16, 28, 0.92), rgba(8, 16, 28, 0.25) 72%, transparent);
+}
+
 .hero__veil {
   position: absolute;
   inset: 0;
