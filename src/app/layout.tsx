@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s · MovieVault",
   },
   description:
-    "Personal movie and TV discovery — trending titles, search, cast, ratings, genres, and trailers via TMDB.",
+    "Personal movie and TV discovery — trending titles, search, cast, ratings, genres, and trailers.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -48,17 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="site-main">{children}</main>
         <footer className="site-footer">
           <div className="site-footer__inner">
-            <p>©️MovieVault 2026</p>
-            <p className="site-footer__fun">
-              Curated with late-night popcorn and too many rewatches.
-            </p>
-            <p>
-              Data from{" "}
-              <a href="https://www.themoviedb.org/" target="_blank" rel="noreferrer">
-                TMDB
-              </a>
-              . This product uses the TMDB API but is not endorsed or certified by TMDB.
-            </p>
+            <p>© MovieVault 2026, All Rights Reserved.</p>
           </div>
         </footer>
         <Analytics />

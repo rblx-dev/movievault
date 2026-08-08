@@ -68,7 +68,7 @@ export default async function HomePage() {
         <MediaRow
           id="movies"
           title="Popular movies"
-          subtitle="Current crowd-pleasers from the TMDB movie charts."
+          subtitle="Current crowd-pleasers from the movie charts."
           items={popularMovies.results}
           mediaType="movie"
         />

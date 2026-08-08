@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { HeroVideo } from "@/components/HeroVideo";
 import {
   backdropUrl,
   displayTitle,
@@ -31,17 +32,7 @@ export function Hero({ featured, trailerKey }: HeroProps) {
           sizes="100vw"
         />
       )}
-      {trailerKey && (
-        <div className="hero__video" aria-hidden>
-          <iframe
-            src={`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&vq=hd2160`}
-            title=""
-            loading="eager"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            tabIndex={-1}
-          />
-        </div>
-      )}
+      {trailerKey && <HeroVideo videoKey={trailerKey} />}
       <div className="hero__veil" aria-hidden />
       <div className="hero__glow" aria-hidden />
       <div className="hero__grain" aria-hidden />

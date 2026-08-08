@@ -133,7 +133,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
             style={{ "--stagger": "5" } as CSSProperties}
           >
             {person.biography?.trim() ||
-              "No biography is available for this person on TMDB yet."}
+              "No biography is available for this person yet."}
           </p>
 
           {person.also_known_as?.length > 0 && (
@@ -151,7 +151,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
         <Reveal className="person__known-for" as="section">
           <div className="section-heading">
             <h2>Known for</h2>
-            <p>Notable film and television credits drawn from TMDB.</p>
+            <p>Notable film and television credits.</p>
           </div>
           <div className="search-grid">
             {knownFor.map((credit, index) => {

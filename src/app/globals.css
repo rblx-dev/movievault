@@ -373,18 +373,27 @@ img {
   inset: 0;
   z-index: -3;
   overflow: hidden;
-  background: #000;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-soft);
   pointer-events: none;
+}
+
+.hero__video.is-playing {
+  opacity: 1;
 }
 
 .hero__video iframe {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100vw;
-  height: 100vh;
+  width: 100vw !important;
+  height: 100vh !important;
   min-width: 177.78vh;
   min-height: 56.25vw;
+  max-width: none;
+  max-height: none;
+  display: block;
   transform: translate(-50%, -50%);
   border: 0;
 }
@@ -426,6 +435,10 @@ img {
   z-index: -1;
   pointer-events: none;
   background: linear-gradient(180deg, transparent, var(--hero-fade));
+}
+
+:root[data-theme="light"] .hero__fade {
+  background: transparent;
 }
 
 .hero__content {
@@ -979,13 +992,6 @@ img {
 .site-footer a {
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-.site-footer__fun {
-  font-family: var(--font-mark), "Comic Sans MS", cursive;
-  font-size: 0.95rem;
-  color: var(--ink);
-  transform: rotate(-1deg);
 }
 
 .reveal {
