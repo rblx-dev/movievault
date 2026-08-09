@@ -478,7 +478,7 @@ body.is-trailer .site-header {
 }
 
 .hero__content {
-  width: min(48rem, calc(100% - 2rem));
+  width: min(44rem, calc(100% - 2rem));
   margin: 0;
   margin-left: max(1rem, 5vw);
   padding: 6.5rem 0 7rem;
@@ -556,7 +556,17 @@ body.is-trailer .site-header {
 }
 
 .hero__play {
-  display: contents;
+  position: absolute;
+  left: 50%;
+  bottom: 2rem;
+  z-index: 2;
+  transform: translateX(-50%);
+  transition: opacity 0.6s var(--ease-out);
+}
+
+.hero--textless .hero__play {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .btn--play {
@@ -564,7 +574,7 @@ body.is-trailer .site-header {
   align-items: center;
   justify-content: center;
   height: 3rem;
-  padding: 0 1.15rem;
+  padding: 0 1.9rem;
   background: transparent;
   border: 2px solid #fff;
   color: transparent;
@@ -1234,5 +1244,15 @@ body.is-trailer .site-header {
 
   .hero__content {
     padding-top: 5.5rem;
+  }
+
+  .hero__play {
+    position: static;
+    left: auto;
+    bottom: auto;
+    z-index: auto;
+    transform: none;
+    margin-top: 1.1rem;
+    text-align: center;
   }
 }
