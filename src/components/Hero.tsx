@@ -142,17 +142,14 @@ export function Hero({ featured, trailers, hasYouTubeSearch = false }: HeroProps
           <Link href={href} className="btn btn--primary">
             Open {title}
           </Link>
-          <Link href="/search" className="btn btn--ghost">
-            Search the vault
-          </Link>
+          {videoKey && (
+            <div className="hero__play">
+              <button type="button" className="btn btn--play" onClick={playTrailer}>
+                Play trailer
+              </button>
+            </div>
+          )}
         </div>
-        {videoKey && (
-          <div className="hero__play">
-            <button type="button" className="btn btn--play" onClick={playTrailer}>
-              Play trailer
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="hero__fade" aria-hidden />

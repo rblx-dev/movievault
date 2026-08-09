@@ -163,6 +163,23 @@ const LOCALIZED_MARKERS = Object.values(LANGUAGE_NAMES).map((name) =>
   name.toLowerCase(),
 );
 
+const LANG_ALIASES: Record<string, string[]> = {
+  fr: ["vf", "français", "francaise", "bande annonce"],
+  es: ["español", "espanol", "latino", "doblado", "castellano"],
+  it: ["italiano", "doppiato", "ufficiale", "ita"],
+  pt: ["português", "portugues", "legendado", "dublado"],
+  de: ["deutsch"],
+  ja: ["日本語", "吹替"],
+  ko: ["한국어", "자막"],
+};
+
+function langTokens(lang: string) {
+  const name = LANGUAGE_NAMES[lang]?.toLowerCase();
+  const tokens = name ? [name] : [];
+  tokens.push(...(LANG_ALIASES[lang] ?? []));
+  return tokens;
+}
+
 function hasLanguageName(title: string) {
   const lower = title.toLowerCase();
   return LOCALIZED_MARKERS.some((marker) => lower.includes(marker));
@@ -176,6 +193,7 @@ function pickMatch(
   preferPlainTitle = false,
 ): LocalizedTrailer | null {
   const movie = movieTitle.toLowerCase();
+  const normMovie = movie.replace(/[^a-z0-9]+/g, "");
   const lang = langName?.toLowerCase();
   const country = countryNeedle?.toLowerCase();
 
@@ -183,8 +201,8 @@ function pickMatch(
     const title = video.title.toLowerCase();
     const channel = video.channelTitle.toLowerCase();
 
-    if (!title.includes(movie)) return -1;
-    if (lang && !title.includes(lang)) return -1;
+    if (!title.replace(/[^a-z0-9]+/g, "").includes(normMovie)) return -1;
+    if (lang && !langTokens(lang).some((token) => title.includes(token))) return -1;
     if (preferPlainTitle && hasLanguageName(video.title)) return -1;
     if (excludeNew && title.includes("new trailer")) return -1;
 
@@ -232,7 +250,11 @@ export async function findLocalizedTrailer({
 }): Promise<LocalizedTrailer | null> {
   if (!hasYouTubeKey()) return null;
 
-  const effectiveLanguage = regionalLanguage(country, region ?? null) ?? language;
+  const regionLang = regionalLanguage(country, region ?? null);
+  const effectiveLanguage =
+    country === "in" && LANGUAGE_NAMES[language]
+      ? language
+      : (regionLang ?? language);
 
   if (effectiveLanguage === "en" && country !== "in") return null;
 
@@ -257,5 +279,5 @@ export async function findLocalizedTrailer({
   if (!langName) return null;
 
   const candidates = await searchVideos(`${movieTitle} ${langName} trailer`);
-  return pickMatch(candidates, movieTitle, langName, null);
+  return pickMatch(candidates, movieTitle, effectiveLanguage, null);
 }
