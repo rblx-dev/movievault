@@ -288,6 +288,19 @@ export async function getWatchProviders(id: string | number, type: MediaType) {
   return region ?? null;
 }
 
+export type TranslationData = {
+  iso_639_1: string;
+  data: { title?: string; name?: string; overview?: string };
+};
+
+type TranslationsResponse = {
+  translations: TranslationData[];
+};
+
+export async function getTranslations(id: string | number, type: MediaType) {
+  return tmdbFetch<TranslationsResponse>(`/${type}/${id}/translations`);
+}
+
 export async function getAccount() {
   return tmdbFetch<{ id: number; username: string; name: string }>("/account");
 }

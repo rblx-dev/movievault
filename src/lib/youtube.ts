@@ -1,5 +1,7 @@
 const YT_BASE = "https://www.googleapis.com/youtube/v3";
 
+import { getTranslations, type MediaType } from "@/lib/tmdb";
+
 export function hasYouTubeKey() {
   return Boolean(process.env.YOUTUBE_API_KEY?.replace(/^\uFEFF/, "").trim());
 }
@@ -171,11 +173,27 @@ const LANG_ALIASES: Record<string, string[]> = {
   de: ["deutsch"],
   ja: ["日本語", "吹替"],
   ko: ["한국어", "자막"],
+  zh: ["中文", "配音"],
+  ar: ["إعلان مترجم", "بالعربية", "دبلجة"],
+  fa: ["دوبله", "فارسی"],
+  cs: ["cz", "dabing", "česky"],
+  tr: ["türkçe", "dublaj"],
 };
 
+const languageDisplayNames = new Intl.DisplayNames(["en"], { type: "language" });
+
+function englishLanguageName(code: string): string | null {
+  if (LANGUAGE_NAMES[code]) return LANGUAGE_NAMES[code];
+  try {
+    return languageDisplayNames.of(code) || null;
+  } catch {
+    return null;
+  }
+}
+
 function langTokens(lang: string) {
-  const name = LANGUAGE_NAMES[lang]?.toLowerCase();
-  const tokens = name ? [name] : [];
+  const name = englishLanguageName(lang);
+  const tokens = name ? [name.toLowerCase()] : [];
   tokens.push(...(LANG_ALIASES[lang] ?? []));
   return tokens;
 }
@@ -187,21 +205,23 @@ function hasLanguageName(title: string) {
 
 function pickMatch(
   videos: FoundVideo[],
-  movieTitle: string,
+  movieTitles: string[],
   langName: string | null,
   countryNeedle: string | null,
   preferPlainTitle = false,
 ): LocalizedTrailer | null {
-  const movie = movieTitle.toLowerCase();
-  const normMovie = movie.replace(/[^a-z0-9]+/g, "");
+  const normMovies = movieTitles
+    .map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, ""))
+    .filter((nm) => nm.length > 0);
   const lang = langName?.toLowerCase();
   const country = countryNeedle?.toLowerCase();
 
   const score = (video: FoundVideo, excludeNew: boolean): number => {
     const title = video.title.toLowerCase();
+    const normTitle = title.replace(/[^a-z0-9]+/g, "");
     const channel = video.channelTitle.toLowerCase();
 
-    if (!title.replace(/[^a-z0-9]+/g, "").includes(normMovie)) return -1;
+    if (!normMovies.some((nm) => normTitle.includes(nm))) return -1;
     if (lang && !langTokens(lang).some((token) => title.includes(token))) return -1;
     if (preferPlainTitle && hasLanguageName(video.title)) return -1;
     if (excludeNew && title.includes("new trailer")) return -1;
@@ -241,12 +261,16 @@ export async function findLocalizedTrailer({
   language,
   country,
   region,
+  tmdbId,
+  tmdbType,
 }: {
   videoId: string;
   movieTitle: string;
   language: string;
   country: string | null;
   region?: string | null;
+  tmdbId?: string | number;
+  tmdbType?: MediaType;
 }): Promise<LocalizedTrailer | null> {
   if (!hasYouTubeKey()) return null;
 
@@ -269,15 +293,29 @@ export async function findLocalizedTrailer({
           channelId: indiaChannel.id,
         })
       : [];
-    const match = pickMatch(onChannel, movieTitle, null, "india", true);
+    const match = pickMatch(onChannel, [movieTitle], null, "india", true);
     if (match) return match;
     const global = await searchVideos(`${movieTitle} trailer`);
-    return pickMatch(global, movieTitle, null, "india", true);
+    return pickMatch(global, [movieTitle], null, "india", true);
   }
 
-  const langName = LANGUAGE_NAMES[effectiveLanguage];
+  const langName = englishLanguageName(effectiveLanguage);
   if (!langName) return null;
 
-  const candidates = await searchVideos(`${movieTitle} ${langName} trailer`);
-  return pickMatch(candidates, movieTitle, effectiveLanguage, null);
+  let titles = [movieTitle];
+  if (tmdbId && tmdbType) {
+    try {
+      const trans = await getTranslations(tmdbId, tmdbType);
+      const entry = trans.translations.find(
+        (t) => t.iso_639_1 === effectiveLanguage,
+      );
+      const localized = entry?.data?.title ?? entry?.data?.name;
+      if (localized) titles = [localized, movieTitle];
+    } catch {
+      // keep the English title when translations are unavailable
+    }
+  }
+
+  const candidates = await searchVideos(`${titles[0]} ${langName} trailer`);
+  return pickMatch(candidates, titles, effectiveLanguage, null);
 }

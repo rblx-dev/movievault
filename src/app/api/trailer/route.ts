@@ -8,6 +8,8 @@ export async function GET(request: NextRequest) {
   const language = params.get("lang");
   const country = params.get("country");
   const region = params.get("region");
+  const id = params.get("id");
+  const type = params.get("type");
 
   if (!key || !title || !language) {
     return NextResponse.json({ key });
@@ -20,6 +22,8 @@ export async function GET(request: NextRequest) {
       language: language.toLowerCase(),
       country: country ? country.toLowerCase() : null,
       region: region ?? null,
+      tmdbId: id ?? undefined,
+      tmdbType: type === "tv" ? "tv" : type === "movie" ? "movie" : undefined,
     });
     return NextResponse.json({
       key: result?.key ?? key,

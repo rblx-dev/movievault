@@ -51,6 +51,8 @@ export function Hero({ featured, trailers, hasYouTubeSearch = false }: HeroProps
         lang: locale.language,
         country: locale.country ?? "",
         region: geo?.region ?? "",
+        id: String(featured.id),
+        type,
       });
       fetch(`/api/trailer?${params.toString()}`, { signal: controller.signal })
         .then((res) => res.json())
