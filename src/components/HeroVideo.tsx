@@ -5,10 +5,12 @@ import { useEffect, useRef, useState } from "react";
 type HeroVideoProps = {
   videoKey: string;
   soundOn?: boolean;
+  language?: string;
 };
 
-function embedUrl(key: string): string {
-  return `https://www.youtube-nocookie.com/embed/${key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${key}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&vq=hd2160&cc_load_policy=0&cc_lang_pref=en&enablejsapi=1`;
+function embedUrl(key: string, language?: string): string {
+  const locale = language ?? "en";
+  return `https://www.youtube-nocookie.com/embed/${key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${key}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&vq=hd2160&cc_load_policy=0&hl=${locale}&cc_lang_pref=${locale}&enablejsapi=1`;
 }
 
 function postCommand(frame: HTMLIFrameElement, func: string, args: unknown[] = []) {
@@ -22,7 +24,7 @@ function postCommand(frame: HTMLIFrameElement, func: string, args: unknown[] = [
   }
 }
 
-export function HeroVideo({ videoKey, soundOn = false }: HeroVideoProps) {
+export function HeroVideo({ videoKey, soundOn = false, language }: HeroVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -32,7 +34,7 @@ export function HeroVideo({ videoKey, soundOn = false }: HeroVideoProps) {
     if (!el) return;
 
     const frame = document.createElement("iframe");
-    frame.src = embedUrl(videoKey);
+    frame.src = embedUrl(videoKey, language);
     frame.title = "";
     frame.loading = "eager";
     frame.allow = "autoplay; encrypted-media; picture-in-picture";
@@ -40,7 +42,10 @@ export function HeroVideo({ videoKey, soundOn = false }: HeroVideoProps) {
     el.appendChild(frame);
     frameRef.current = frame;
     setVisible(true);
-  }, [videoKey]);
+    return () => {
+      el.removeChild(frame);
+    };
+  }, [videoKey, language]);
 
   useEffect(() => {
     if (!soundOn) return;

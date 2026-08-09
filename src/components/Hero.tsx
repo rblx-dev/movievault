@@ -5,19 +5,23 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HeroVideo } from "@/components/HeroVideo";
+import { getUserLocale, getUserRegion } from "@/lib/locale";
 import {
   backdropUrl,
   displayTitle,
+  getTrailerForLanguage,
   MediaItem,
   resolveMediaType,
+  Video,
 } from "@/lib/tmdb";
 
 type HeroProps = {
   featured: MediaItem;
-  trailerKey?: string | null;
+  trailers: Video[];
+  hasYouTubeSearch?: boolean;
 };
 
-export function Hero({ featured, trailerKey }: HeroProps) {
+export function Hero({ featured, trailers, hasYouTubeSearch = false }: HeroProps) {
   const type = resolveMediaType(featured) || "movie";
   const title = displayTitle(featured);
   const backdrop = backdropUrl(featured.backdrop_path || featured.poster_path, "original");
@@ -27,6 +31,39 @@ export function Hero({ featured, trailerKey }: HeroProps) {
   const [textless, setTextless] = useState(false);
   const [trailerMode, setTrailerMode] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [videoKey, setVideoKey] = useState(() => {
+    const locale = getUserLocale();
+    return getTrailerForLanguage(trailers, locale.language)?.key ?? null;
+  });
+  const [language] = useState(() => getUserLocale().language);
+  const initialKeyRef = useRef(videoKey);
+
+  useEffect(() => {
+    const initialKey = initialKeyRef.current;
+    if (!hasYouTubeSearch || !initialKey) return;
+    const locale = getUserLocale();
+    const controller = new AbortController();
+
+    getUserRegion().then((geo) => {
+      const params = new URLSearchParams({
+        key: initialKey,
+        title,
+        lang: locale.language,
+        country: locale.country ?? "",
+        region: geo?.region ?? "",
+      });
+      fetch(`/api/trailer?${params.toString()}`, { signal: controller.signal })
+        .then((res) => res.json())
+        .then((data: { key?: string }) => {
+          if (data.key && data.key !== initialKey) {
+            setVideoKey(data.key);
+          }
+        })
+        .catch(() => {});
+    });
+
+    return () => controller.abort();
+  }, [hasYouTubeSearch, title]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -71,7 +108,9 @@ export function Hero({ featured, trailerKey }: HeroProps) {
           sizes="100vw"
         />
       )}
-      {trailerKey && <HeroVideo videoKey={trailerKey} soundOn={soundOn} />}
+      {videoKey && (
+        <HeroVideo videoKey={videoKey} soundOn={soundOn} language={language} />
+      )}
       <div className="hero__veil" aria-hidden />
       <div className="hero__glow" aria-hidden />
       <div className="hero__grain" aria-hidden />
@@ -103,22 +142,21 @@ export function Hero({ featured, trailerKey }: HeroProps) {
           <Link href={href} className="btn btn--primary">
             Open {title}
           </Link>
-          {trailerKey && (
-            <button type="button" className="btn btn--ghost" onClick={playTrailer}>
-              Play trailer
-            </button>
-          )}
           <Link href="/search" className="btn btn--ghost">
             Search the vault
           </Link>
         </div>
       </div>
 
+      {videoKey && (
+        <div className="hero__play">
+          <button type="button" className="btn btn--play" onClick={playTrailer}>
+            Play trailer
+          </button>
+        </div>
+      )}
+
       <div className="hero__fade" aria-hidden />
-      <div className="hero__scroll" aria-hidden>
-        <span className="hero__scroll-text">Scroll</span>
-        <span className="hero__scroll-line" />
-      </div>
     </section>
   );
 }

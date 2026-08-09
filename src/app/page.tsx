@@ -7,11 +7,12 @@ import {
   getPopularMovies,
   getPopularTV,
   getTopRatedMovies,
-  getTrailer,
-  getTrending,
   getTVDetails,
+  getTrending,
   resolveMediaType,
+  Video,
 } from "@/lib/tmdb";
+import { hasYouTubeKey } from "@/lib/youtube";
 
 export default async function HomePage() {
   const [trending, popularMovies, popularTV, topRated] = await Promise.all([
@@ -25,7 +26,7 @@ export default async function HomePage() {
     trending.results.find((item) => resolveMediaType(item) && item.backdrop_path) ||
     trending.results[0];
 
-  let trailerKey: string | null = null;
+  let trailers: Video[] = [];
   if (featured) {
     const type = resolveMediaType(featured) || "movie";
     try {
@@ -33,15 +34,21 @@ export default async function HomePage() {
         type === "movie"
           ? await getMovieDetails(featured.id)
           : await getTVDetails(featured.id);
-      trailerKey = getTrailer(details.videos?.results)?.key ?? null;
+      trailers = details.videos?.results ?? [];
     } catch {
-      trailerKey = null;
+      trailers = [];
     }
   }
 
   return (
     <>
-      {featured && <Hero featured={featured} trailerKey={trailerKey} />}
+      {featured && (
+        <Hero
+          featured={featured}
+          trailers={trailers}
+          hasYouTubeSearch={hasYouTubeKey()}
+        />
+      )}
       <div className="marquee">
         <div className="marquee__track">
           {[...trending.results, ...trending.results].map((item, i) => (

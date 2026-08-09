@@ -39,6 +39,7 @@ export type Video = {
   site: string;
   type: string;
   official: boolean;
+  iso_639_1?: string;
 };
 
 export type MediaDetails = MediaItem & {
@@ -123,19 +124,36 @@ async function tmdbFetch<T>(path: string, searchParams?: Record<string, string>)
     }
   }
 
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-      Accept: "application/json",
-    },
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) {
-    throw new Error(`TMDB request failed: ${res.status} ${path}`);
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          Accept: "application/json",
+        },
+        next: { revalidate: 3600 },
+      });
+      if (res.ok) {
+        return res.json() as Promise<T>;
+      }
+      lastError = new Error(`TMDB request failed: ${res.status} ${path}`);
+      if (res.status < 500 && res.status !== 429) {
+        throw lastError;
+      }
+    } catch (err) {
+      lastError = err;
+    }
+    if (attempt < 3) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 300 * 2 ** attempt + Math.random() * 150),
+      );
+    }
   }
 
-  return res.json() as Promise<T>;
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(`TMDB request failed: ${path}`);
 }
 
 export function posterUrl(path: string | null | undefined, size: "w342" | "w500" | "w780" = "w500") {
@@ -180,18 +198,42 @@ export function resolveMediaType(item: MediaItem): MediaType | null {
   return null;
 }
 
-export function getTrailer(videos?: Video[]) {
-  if (!videos?.length) return null;
+function pickTrailer(videos: Video[], language?: string): Video | null {
+  if (!videos.length) return null;
   const youtube = videos.filter((v) => v.site === "YouTube");
+  if (!youtube.length) return null;
   const trailers = youtube.filter((v) => v.type === "Trailer");
+
+  const best = (list: Video[]) =>
+    list.find((v) => v.official && /official/i.test(v.name)) ||
+    list.find((v) => v.official) ||
+    list.find((v) => !v.official);
+
+  const langPrefix = language?.split("-")[0].toLowerCase();
+  if (langPrefix) {
+    const localized = trailers.filter(
+      (v) => v.iso_639_1?.toLowerCase() === langPrefix,
+    );
+    if (localized.length) {
+      const picked = best(localized);
+      if (picked) return picked;
+    }
+  }
+
   return (
-    trailers.find((v) => v.official && /official/i.test(v.name)) ||
-    trailers.find((v) => v.official) ||
-    trailers.find((v) => !v.official) ||
+    best(trailers) ||
     youtube.find((v) => v.type === "Teaser") ||
     youtube[0] ||
     null
   );
+}
+
+export function getTrailer(videos?: Video[]) {
+  return pickTrailer(videos ?? [], undefined);
+}
+
+export function getTrailerForLanguage(videos: Video[], language?: string) {
+  return pickTrailer(videos, language);
 }
 
 export async function getTrending(timeWindow: "day" | "week" = "week") {
