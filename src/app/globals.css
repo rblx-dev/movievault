@@ -250,9 +250,11 @@ body.is-trailer .site-header {
 
 .header-clock {
   display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  min-width: 3.6rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   line-height: 1;
   color: var(--ink-soft);
   font-variant-numeric: tabular-nums;
