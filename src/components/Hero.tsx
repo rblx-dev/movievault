@@ -15,17 +15,44 @@ import {
   Video,
 } from "@/lib/tmdb";
 
+export type HeroStrings = {
+  brand: string;
+  headline: string;
+  headlineAccent: string;
+  lede: string;
+  openTitle: string;
+  play: string;
+};
+
 type HeroProps = {
   featured: MediaItem;
   trailers: Video[];
   hasYouTubeSearch?: boolean;
+  strings?: HeroStrings;
+  trailerTitle?: string;
 };
 
-export function Hero({ featured, trailers, hasYouTubeSearch = false }: HeroProps) {
+const DEFAULT_STRINGS: HeroStrings = {
+  brand: "Movie Vault",
+  headline: "Your personal vault for",
+  headlineAccent: "films & television.",
+  lede: "Browse through trending titles, dig into casts, ratings, and view trailers.",
+  openTitle: "Open",
+  play: "Play trailer",
+};
+
+export function Hero({
+  featured,
+  trailers,
+  hasYouTubeSearch = false,
+  strings = DEFAULT_STRINGS,
+  trailerTitle,
+}: HeroProps) {
   const type = resolveMediaType(featured) || "movie";
   const title = displayTitle(featured);
   const backdrop = backdropUrl(featured.backdrop_path || featured.poster_path, "original");
   const href = `/${type}/${featured.id}`;
+  const searchTitle = trailerTitle || title;
   const sectionRef = useRef<HTMLElement>(null);
   const [started, setStarted] = useState(false);
   const [textless, setTextless] = useState(false);
@@ -47,7 +74,7 @@ export function Hero({ featured, trailers, hasYouTubeSearch = false }: HeroProps
     getUserRegion().then((geo) => {
       const params = new URLSearchParams({
         key: initialKey,
-        title,
+        title: searchTitle,
         lang: locale.language,
         country: locale.country ?? "",
         region: geo?.region ?? "",
@@ -65,7 +92,7 @@ export function Hero({ featured, trailers, hasYouTubeSearch = false }: HeroProps
     });
 
     return () => controller.abort();
-  }, [hasYouTubeSearch, title]);
+  }, [hasYouTubeSearch, searchTitle, featured.id, type]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -122,32 +149,32 @@ export function Hero({ featured, trailers, hasYouTubeSearch = false }: HeroProps
           className="hero__brand rise-stagger"
           style={{ "--stagger": "0" } as CSSProperties}
         >
-          Movie Vault
+          {strings.brand}
         </p>
         <h1
           className="hero__headline rise-stagger"
           style={{ "--stagger": "1" } as CSSProperties}
         >
-          Your personal vault for{" "}
-          <span className="hero__headline-accent">films &amp; television.</span>
+          {strings.headline}{" "}
+          <span className="hero__headline-accent">{strings.headlineAccent}</span>
         </h1>
         <p
           className="hero__lede rise-stagger"
           style={{ "--stagger": "2" } as CSSProperties}
         >
-          Browse through trending titles, dig into casts, ratings, and view trailers.
+          {strings.lede}
         </p>
         <div
           className="hero__actions rise-stagger"
           style={{ "--stagger": "3" } as CSSProperties}
         >
           <Link href={href} className="btn btn--primary">
-            Open {title}
+            {strings.openTitle}
           </Link>
           {videoKey && (
             <div className="hero__play">
               <button type="button" className="btn btn--play" onClick={playTrailer}>
-                Play trailer
+                {strings.play}
               </button>
             </div>
           )}

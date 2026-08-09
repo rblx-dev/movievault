@@ -9,9 +9,10 @@ type MediaRowProps = {
   subtitle?: string;
   items: MediaItem[];
   mediaType?: "movie" | "tv";
+  lang?: string;
 };
 
-export function MediaRow({ id, title, subtitle, items, mediaType }: MediaRowProps) {
+export function MediaRow({ id, title, subtitle, items, mediaType, lang = "en" }: MediaRowProps) {
   const filtered = items.filter((item) => {
     if (mediaType) return true;
     return item.media_type === "movie" || item.media_type === "tv";
@@ -34,7 +35,7 @@ export function MediaRow({ id, title, subtitle, items, mediaType }: MediaRowProp
               className="rise-stagger"
               style={{ "--stagger": String(Math.min(index, 8)) } as CSSProperties}
             >
-              <MediaCard item={item} mediaType={mediaType} priority={index < 4} />
+              <MediaCard item={item} mediaType={mediaType} priority={index < 4} lang={lang} />
             </div>
           ))}
         </div>

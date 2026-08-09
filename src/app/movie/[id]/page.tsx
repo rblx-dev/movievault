@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DetailView } from "@/components/DetailView";
+import { getSiteLang } from "@/lib/site-lang";
 import { displayTitle, getMovieDetails } from "@/lib/tmdb";
 
 type MoviePageProps = {
@@ -8,8 +9,9 @@ type MoviePageProps = {
 
 export async function generateMetadata({ params }: MoviePageProps): Promise<Metadata> {
   const { id } = await params;
+  const lang = await getSiteLang();
   try {
-    const movie = await getMovieDetails(id);
+    const movie = await getMovieDetails(id, lang);
     return {
       title: displayTitle(movie),
       description: movie.overview,
@@ -21,6 +23,7 @@ export async function generateMetadata({ params }: MoviePageProps): Promise<Meta
 
 export default async function MoviePage({ params }: MoviePageProps) {
   const { id } = await params;
-  const details = await getMovieDetails(id);
-  return <DetailView details={details} type="movie" />;
+  const lang = await getSiteLang();
+  const details = await getMovieDetails(id, lang);
+  return <DetailView details={details} type="movie" lang={lang} />;
 }

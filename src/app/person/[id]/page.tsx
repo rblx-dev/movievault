@@ -5,6 +5,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MediaCard } from "@/components/MediaCard";
 import { Reveal } from "@/components/Reveal";
+import { t } from "@/lib/i18n";
+import { getSiteLang } from "@/lib/site-lang";
 import {
   getPersonDetails,
   MediaType,
@@ -16,11 +18,11 @@ type PersonPageProps = {
   params: Promise<{ id: string }>;
 };
 
-function formatDate(value: string | null) {
+function formatDate(value: string | null, lang: string) {
   if (!value) return null;
   const date = new Date(`${value}T00:00:00`);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(lang === "en" ? "en-US" : lang, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -29,8 +31,9 @@ function formatDate(value: string | null) {
 
 export async function generateMetadata({ params }: PersonPageProps): Promise<Metadata> {
   const { id } = await params;
+  const lang = await getSiteLang();
   try {
-    const person = await getPersonDetails(id);
+    const person = await getPersonDetails(id, lang);
     return {
       title: person.name,
       description: person.biography
@@ -44,9 +47,10 @@ export async function generateMetadata({ params }: PersonPageProps): Promise<Met
 
 export default async function PersonPage({ params }: PersonPageProps) {
   const { id } = await params;
+  const lang = await getSiteLang();
   let person;
   try {
-    person = await getPersonDetails(id);
+    person = await getPersonDetails(id, lang);
   } catch {
     notFound();
   }
@@ -54,8 +58,8 @@ export default async function PersonPage({ params }: PersonPageProps) {
   if (!person?.id) notFound();
 
   const photo = profileUrl(person.profile_path, "h632");
-  const birthday = formatDate(person.birthday);
-  const deathday = formatDate(person.deathday);
+  const birthday = formatDate(person.birthday, lang);
+  const deathday = formatDate(person.deathday, lang);
 
   const knownFor = [...(person.combined_credits?.cast || [])]
     .filter((credit) => {
@@ -102,7 +106,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
           >
             <Link href="/">MovieVault</Link>
             <span aria-hidden> / </span>
-            Person
+            {t(lang, "person.person")}
           </p>
           <h1
             className="person__name rise-stagger"
@@ -115,7 +119,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
               className="person__department rise-stagger"
               style={{ "--stagger": "3" } as CSSProperties}
             >
-              Known for {person.known_for_department}
+              {t(lang, "person.knownForDept", { DEPARTMENT: person.known_for_department })}
             </p>
           )}
 
@@ -123,8 +127,8 @@ export default async function PersonPage({ params }: PersonPageProps) {
             className="detail__facts rise-stagger"
             style={{ "--stagger": "4" } as CSSProperties}
           >
-            {birthday && <span>Born {birthday}</span>}
-            {deathday && <span>Died {deathday}</span>}
+            {birthday && <span>{t(lang, "person.born", { DATE: birthday })}</span>}
+            {deathday && <span>{t(lang, "person.died", { DATE: deathday })}</span>}
             {person.place_of_birth && <span>{person.place_of_birth}</span>}
           </div>
 
@@ -133,7 +137,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
             style={{ "--stagger": "5" } as CSSProperties}
           >
             {person.biography?.trim() ||
-              "No biography is available for this person yet."}
+              t(lang, "person.noBio")}
           </p>
 
           {person.also_known_as?.length > 0 && (
@@ -141,7 +145,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
               className="person__aka rise-stagger"
               style={{ "--stagger": "6" } as CSSProperties}
             >
-              Also known as {person.also_known_as.slice(0, 4).join(" · ")}
+              {t(lang, "person.aka", { NAMES: person.also_known_as.slice(0, 4).join(" · ") })}
             </p>
           )}
         </div>
@@ -150,8 +154,8 @@ export default async function PersonPage({ params }: PersonPageProps) {
       {knownFor.length > 0 && (
         <Reveal className="person__known-for" as="section">
           <div className="section-heading">
-            <h2>Known for</h2>
-            <p>Notable film and television credits.</p>
+            <h2>{t(lang, "person.knownFor")}</h2>
+            <p>{t(lang, "person.knownForSub")}</p>
           </div>
           <div className="search-grid">
             {knownFor.map((credit, index) => {
@@ -162,6 +166,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
                   item={{ ...credit, media_type: type }}
                   mediaType={type}
                   priority={index < 4}
+                  lang={lang}
                 />
               );
             })}

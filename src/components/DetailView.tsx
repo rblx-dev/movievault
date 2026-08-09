@@ -6,6 +6,7 @@ import { CastStrip } from "@/components/CastStrip";
 import { Reveal } from "@/components/Reveal";
 import { TrailerPlayer } from "@/components/TrailerPlayer";
 import { WatchProviders } from "@/components/WatchProviders";
+import { t } from "@/lib/i18n";
 import {
   backdropUrl,
   displayTitle,
@@ -19,9 +20,10 @@ import {
 type DetailViewProps = {
   details: MediaDetails;
   type: MediaType;
+  lang?: string;
 };
 
-export function DetailView({ details, type }: DetailViewProps) {
+export function DetailView({ details, type, lang = "en" }: DetailViewProps) {
   if (!details?.id) notFound();
 
   const title = displayTitle(details);
@@ -30,13 +32,18 @@ export function DetailView({ details, type }: DetailViewProps) {
   const backdrop = backdropUrl(details.backdrop_path, "original");
   const trailer = getTrailer(details.videos?.results);
   const cast = details.credits?.cast || [];
+  const typeLabel = type === "movie" ? t(lang, "detail.film") : t(lang, "detail.series");
   const runtime =
     type === "movie"
       ? details.runtime
-        ? `${details.runtime} min`
+        ? `${details.runtime} ${t(lang, "detail.min")}`
         : null
       : details.number_of_seasons
-        ? `${details.number_of_seasons} season${details.number_of_seasons === 1 ? "" : "s"}`
+        ? `${details.number_of_seasons} ${
+            details.number_of_seasons === 1
+              ? t(lang, "detail.seasonOne")
+              : t(lang, "detail.seasonMany")
+          }`
         : null;
 
   return (
@@ -63,7 +70,7 @@ export function DetailView({ details, type }: DetailViewProps) {
           {poster ? (
             <Image
               src={poster}
-              alt={`${title} poster`}
+              alt={t(lang, "poster.alt", { TITLE: title })}
               width={420}
               height={630}
               className="detail__poster"
@@ -81,7 +88,7 @@ export function DetailView({ details, type }: DetailViewProps) {
           >
             <Link href="/">MovieVault</Link>
             <span aria-hidden> / </span>
-            {type === "movie" ? "Film" : "Series"}
+            {typeLabel}
           </p>
           <h1 className="rise-stagger" style={{ "--stagger": "2" } as CSSProperties}>
             {title}
@@ -105,7 +112,9 @@ export function DetailView({ details, type }: DetailViewProps) {
               <span className="detail__score">{details.vote_average.toFixed(1)} / 10</span>
             )}
             {details.vote_count > 0 && (
-              <span>{details.vote_count.toLocaleString()} votes</span>
+              <span>
+                {details.vote_count.toLocaleString()} {t(lang, "detail.votes")}
+              </span>
             )}
           </div>
 
@@ -124,18 +133,18 @@ export function DetailView({ details, type }: DetailViewProps) {
             className="detail__overview rise-stagger"
             style={{ "--stagger": "6" } as CSSProperties}
           >
-            {details.overview || "No synopsis available."}
+            {details.overview || t(lang, "detail.noSynopsis")}
           </p>
         </div>
       </Reveal>
 
       {trailer && (
         <Reveal as="div">
-          <TrailerPlayer trailer={trailer} />
+          <TrailerPlayer trailer={trailer} lang={lang} />
         </Reveal>
       )}
-      <WatchProviders id={details.id} type={type} />
-      <CastStrip cast={cast} />
+      <WatchProviders id={details.id} type={type} lang={lang} />
+      <CastStrip cast={cast} lang={lang} />
     </article>
   );
 }

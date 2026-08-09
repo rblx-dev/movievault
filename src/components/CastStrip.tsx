@@ -2,21 +2,23 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { t } from "@/lib/i18n";
 import { CastMember, profileUrl } from "@/lib/tmdb";
 
 type CastStripProps = {
   cast: CastMember[];
+  lang?: string;
 };
 
-export function CastStrip({ cast }: CastStripProps) {
+export function CastStrip({ cast, lang = "en" }: CastStripProps) {
   const top = cast.slice(0, 12);
   if (!top.length) return null;
 
   return (
     <Reveal as="section" className="cast-strip">
       <div className="section-heading">
-        <h2>Cast</h2>
-        <p>Principal performers billed for this title.</p>
+        <h2>{t(lang, "detail.cast")}</h2>
+        <p>{t(lang, "detail.castSub")}</p>
       </div>
       <div className="cast-rail">
         {top.map((person, index) => {

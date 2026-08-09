@@ -12,6 +12,8 @@ export type MediaItem = {
   id: number;
   title?: string;
   name?: string;
+  original_title?: string;
+  original_name?: string;
   overview: string;
   poster_path: string | null;
   backdrop_path: string | null;
@@ -186,6 +188,16 @@ export function displayTitle(item: Pick<MediaItem, "title" | "name">) {
   return item.title || item.name || "Untitled";
 }
 
+export function originalTitle(item: Pick<MediaItem, "original_title" | "original_name" | "title" | "name">) {
+  return (
+    item.original_title ||
+    item.original_name ||
+    item.title ||
+    item.name ||
+    "Untitled"
+  );
+}
+
 export function displayYear(item: Pick<MediaItem, "release_date" | "first_air_date">) {
   const date = item.release_date || item.first_air_date;
   return date ? date.slice(0, 4) : null;
@@ -236,49 +248,53 @@ export function getTrailerForLanguage(videos: Video[], language?: string) {
   return pickTrailer(videos, language);
 }
 
-export async function getTrending(timeWindow: "day" | "week" = "week") {
-  return tmdbFetch<Paginated<MediaItem>>(`/trending/all/${timeWindow}`);
+export async function getTrending(timeWindow: "day" | "week" = "week", lang = "en-US") {
+  return tmdbFetch<Paginated<MediaItem>>(`/trending/all/${timeWindow}`, {
+    language: lang,
+  });
 }
 
-export async function getPopularMovies() {
-  return tmdbFetch<Paginated<MediaItem>>("/movie/popular");
+export async function getPopularMovies(lang = "en-US") {
+  return tmdbFetch<Paginated<MediaItem>>("/movie/popular", { language: lang });
 }
 
-export async function getPopularTV() {
-  return tmdbFetch<Paginated<MediaItem>>("/tv/popular");
+export async function getPopularTV(lang = "en-US") {
+  return tmdbFetch<Paginated<MediaItem>>("/tv/popular", { language: lang });
 }
 
-export async function getTopRatedMovies() {
-  return tmdbFetch<Paginated<MediaItem>>("/movie/top_rated");
+export async function getTopRatedMovies(lang = "en-US") {
+  return tmdbFetch<Paginated<MediaItem>>("/movie/top_rated", {
+    language: lang,
+  });
 }
 
-export async function searchMulti(query: string, page = "1") {
+export async function searchMulti(query: string, page = "1", lang = "en-US") {
   return tmdbFetch<Paginated<MediaItem>>("/search/multi", {
     query,
     include_adult: "false",
-    language: "en-US",
+    language: lang,
     page,
   });
 }
 
-export async function getMovieDetails(id: string | number) {
+export async function getMovieDetails(id: string | number, lang = "en-US") {
   return tmdbFetch<MediaDetails>(`/movie/${id}`, {
     append_to_response: "credits,videos",
-    language: "en-US",
+    language: lang,
   });
 }
 
-export async function getTVDetails(id: string | number) {
+export async function getTVDetails(id: string | number, lang = "en-US") {
   return tmdbFetch<MediaDetails>(`/tv/${id}`, {
     append_to_response: "credits,videos",
-    language: "en-US",
+    language: lang,
   });
 }
 
-export async function getPersonDetails(id: string | number) {
+export async function getPersonDetails(id: string | number, lang = "en-US") {
   return tmdbFetch<PersonDetails>(`/person/${id}`, {
     append_to_response: "combined_credits",
-    language: "en-US",
+    language: lang,
   });
 }
 

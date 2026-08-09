@@ -2,8 +2,13 @@ import Link from "next/link";
 import { SearchForm } from "./SearchForm";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSelector } from "./LanguageSelector";
+import { t } from "@/lib/i18n";
 
-export function Header() {
+type HeaderProps = {
+  lang?: string;
+};
+
+export function Header({ lang = "en" }: HeaderProps) {
   return (
     <header className="site-header">
       <div className="site-header__inner">
@@ -24,20 +29,29 @@ export function Header() {
         </Link>
         <nav className="site-nav" aria-label="Primary">
           <Link href="/#trending" className="site-nav__link">
-            Trending
+            {t(lang, "nav.trending")}
           </Link>
           <Link href="/#movies" className="site-nav__link">
-            Films
+            {t(lang, "nav.films")}
           </Link>
           <Link href="/#tv" className="site-nav__link">
-            TV
+            {t(lang, "nav.tv")}
           </Link>
         </nav>
         <div className="site-header__actions">
           <div className="site-header__search">
-            <SearchForm compact />
+            <SearchForm
+              compact
+              placeholder={t(lang, "search.placeholder")}
+              label={t(lang, "search.label")}
+              submitLabel={t(lang, "search.button")}
+            />
           </div>
-          <LanguageSelector />
+          <LanguageSelector
+            lang={lang}
+            ariaLabel={t(lang, "selector.aria")}
+            autoLabel={t(lang, "selector.auto")}
+          />
           <ThemeToggle />
         </div>
       </div>

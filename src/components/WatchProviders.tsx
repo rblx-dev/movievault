@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Reveal } from "@/components/Reveal";
+import { t } from "@/lib/i18n";
 import {
   getWatchProviders,
   MediaType,
@@ -10,17 +11,18 @@ import {
 type WatchProvidersProps = {
   id: string | number;
   type: MediaType;
+  lang?: string;
 };
 
 const GROUPS = [
-  { key: "flatrate", label: "Stream" },
-  { key: "free", label: "Free" },
-  { key: "ads", label: "With Ads" },
-  { key: "rent", label: "Rent" },
-  { key: "buy", label: "Buy" },
+  { key: "flatrate", labelKey: "detail.stream" },
+  { key: "free", labelKey: "detail.free" },
+  { key: "ads", labelKey: "detail.ads" },
+  { key: "rent", labelKey: "detail.rent" },
+  { key: "buy", labelKey: "detail.buy" },
 ] as const;
 
-export async function WatchProviders({ id, type }: WatchProvidersProps) {
+export async function WatchProviders({ id, type, lang = "en" }: WatchProvidersProps) {
   let providers: WatchProvidersData | null = null;
   try {
     providers = await getWatchProviders(id, type);
@@ -34,12 +36,12 @@ export async function WatchProviders({ id, type }: WatchProvidersProps) {
   return (
     <Reveal as="section" className="watch">
       <div className="section-heading">
-        <h2>Where to Watch</h2>
-        <p>Everywhere this title is currently available to stream, rent, or buy.</p>
+        <h2>{t(lang, "detail.watchWhere")}</h2>
+        <p>{t(lang, "detail.watchSub")}</p>
       </div>
       {groups.map((group) => (
         <div key={group.key} className="watch__group">
-          <h3 className="watch__group-label">{group.label}</h3>
+          <h3 className="watch__group-label">{t(lang, group.labelKey)}</h3>
           <ul className="watch__list">
             {providers[group.key]!.map((provider) => {
               const logo = providerLogoUrl(provider.logo_path);

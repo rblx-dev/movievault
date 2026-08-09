@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { t } from "@/lib/i18n";
 import {
   displayTitle,
   displayYear,
@@ -12,9 +13,10 @@ type MediaCardProps = {
   item: MediaItem;
   mediaType?: "movie" | "tv";
   priority?: boolean;
+  lang?: string;
 };
 
-export function MediaCard({ item, mediaType, priority = false }: MediaCardProps) {
+export function MediaCard({ item, mediaType, priority = false, lang = "en" }: MediaCardProps) {
   const type = mediaType || resolveMediaType(item);
   if (!type) return null;
 
@@ -22,6 +24,8 @@ export function MediaCard({ item, mediaType, priority = false }: MediaCardProps)
   const year = displayYear(item);
   const poster = posterUrl(item.poster_path, "w500");
   const rating = item.vote_average ? item.vote_average.toFixed(1) : null;
+  const typeLabel = type === "movie" ? t(lang, "detail.film") : t(lang, "detail.series");
+  const posterAlt = t(lang, "poster.alt", { TITLE: title });
 
   return (
     <article className="media-card">
@@ -30,7 +34,7 @@ export function MediaCard({ item, mediaType, priority = false }: MediaCardProps)
           {poster ? (
             <Image
               src={poster}
-              alt={`${title} poster`}
+              alt={posterAlt}
               fill
               sizes="(max-width: 640px) 42vw, (max-width: 1024px) 22vw, 180px"
               priority={priority}
@@ -45,7 +49,7 @@ export function MediaCard({ item, mediaType, priority = false }: MediaCardProps)
         <div className="media-card__meta">
           <h3>{title}</h3>
           <p>
-            <span className="media-card__type">{type === "movie" ? "Film" : "Series"}</span>
+            <span className="media-card__type">{typeLabel}</span>
             {year && <span> · {year}</span>}
           </p>
         </div>
