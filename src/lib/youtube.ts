@@ -316,6 +316,6 @@ export async function findLocalizedTrailer({
     }
   }
 
-  const candidates = await searchVideos(`${titles[0]} ${langName} trailer`);
+  const candidates = await searchVideos(`${movieTitle} ${langName} trailer`);
   return pickMatch(candidates, titles, effectiveLanguage, null);
 }

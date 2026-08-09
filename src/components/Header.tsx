@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SearchForm } from "./SearchForm";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageSelector } from "./LanguageSelector";
 
 export function Header() {
   return (
@@ -36,6 +37,7 @@ export function Header() {
           <div className="site-header__search">
             <SearchForm compact />
           </div>
+          <LanguageSelector />
           <ThemeToggle />
         </div>
       </div>

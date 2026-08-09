@@ -1,13 +1,28 @@
 const REGION_CACHE_KEY = "mv.region";
+const LANGUAGE_STORAGE_KEY = "mv.language";
 
 export type GeoResult = {
   country?: string;
   region?: string;
 } | null;
 
+export function getSelectedLanguage(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const value = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    return value && value.trim() ? value.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 export function getUserLocale(): { language: string; country: string | null } {
   if (typeof navigator === "undefined") {
     return { language: "en", country: null };
+  }
+  const selected = getSelectedLanguage();
+  if (selected) {
+    return { language: selected, country: null };
   }
   const locales =
     navigator.languages?.length > 0 ? navigator.languages : [navigator.language];

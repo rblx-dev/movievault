@@ -265,6 +265,64 @@ body.is-trailer .site-header {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
+.lang-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper-dim);
+  color: var(--ink);
+  transition:
+    background var(--motion) var(--ease-soft),
+    color var(--motion) var(--ease-soft),
+    transform var(--motion) var(--ease-out),
+    box-shadow var(--motion) var(--ease-soft);
+}
+
+.lang-select:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.lang-select__globe {
+  display: grid;
+  place-items: center;
+  padding-left: 0.7rem;
+  opacity: 0.75;
+}
+
+.lang-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1;
+  height: 100%;
+  padding: 0 1.6rem 0 0.45rem;
+  max-width: 8.5rem;
+  cursor: pointer;
+}
+
+.lang-select::after {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-top: -0.26rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
 .theme-toggle svg {
   display: block;
 }
@@ -1226,6 +1284,10 @@ body.is-trailer .site-header {
   .site-header__search {
     flex: 1;
     width: 100%;
+  }
+
+  .lang-select select {
+    max-width: 6.5rem;
   }
 
   .brand-mark {
