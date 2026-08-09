@@ -114,7 +114,6 @@ img {
   backdrop-filter: blur(14px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--line);
-  overflow: hidden;
   transition:
     transform 0.5s var(--ease-out),
     opacity 0.5s var(--ease-out);
